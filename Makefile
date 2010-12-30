@@ -18,6 +18,8 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+INSTALL_PATH?=/usr/local
+
 all: v8lib jlint2c
 	g++ -m64 -Ilib/v8/include src/jslint.cpp -o bin/jslint lib/v8/libv8.a -lpthread
 
@@ -26,4 +28,6 @@ jlint2c:
 
 v8lib:
 	if test -s lib/v8/libv8.a; then echo "v8 built"; else cd lib/v8; scons arch=x64 mode=release library=static snapshot=on; fi
-    
+
+install:
+	cp bin/jslint ${INSTALL_PATH}/bin
