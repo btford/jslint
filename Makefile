@@ -19,7 +19,7 @@
 # THE SOFTWARE.
 
 all: v8lib jlint2c
-	g++ -m64 -Ilib/v8/include src/jslint.cpp -o bin/jslint lib/v8/libv8.a -lpthread
+	g++ -m64 -Ilib/v8/include -Ilib/tclap-1.2.0/include src/jslint.cpp -o bin/jslint lib/v8/libv8.a -lpthread
 
 jlint2c:
 	tools/jslint2c.py
