@@ -31,6 +31,13 @@ THE SOFTWARE.
 using namespace v8;
 
 namespace jslint {
+    const char* const valid_options[] = {
+        "adsafe", "bitwise", "browser", "cap", "css", "debug", "devel",
+        "eqeqeq", "es5", "evil", "forin", "fragment", "immed", "laxbreak",
+        "newcap", "nomen", "on", "onevar", "passfail", "plusplus", "regexp",
+        "rhino", "safe", "strict", "sub", "undef", "white", "widget",
+        "windows"};
+
     std::string default_options() {
         std::string options = "{passfail: true, white: true, onevar: true, undef: true,  nomen: true, eqeqeq: true, plusplus: true, bitwise: true, regexp: true, newcap: true, immed: true, strict: true}";
         return options;
