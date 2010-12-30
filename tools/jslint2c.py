@@ -20,7 +20,26 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 
+import sys
+import os
 import js2c
 
+JSLINT_SOURCE = 'lib/jslint/fulljslint.js'
+JSLINT_C_OUTPUT = 'src/jslint.h'
+
+BASE_DIR = os.path.dirname(os.path.realpath(__file__)) + "/../"
+
 if __name__ == "__main__":
-    js2c.JS2C(["./src/jslint.js"], ["./src/jslint.h"])
+    if not os.path.exists(BASE_DIR + JSLINT_SOURCE):
+      if os.path.exists(BASE_DIR + JSLINT_C_OUTPUT):
+          print "WARNING: %s cannot be found. Try updating git submodules." % JSLINT_SOURCE
+          print "Using existing %s" % JSLINT_C_OUTPUT
+      else:
+          print "ERROR: %s cannot be found.\nHave you run `git submodule init; git submodule update`?" % JSLINT_SOURCE
+          sys.exit(1)
+    else:
+      if not os.path.exists(BASE_DIR + JSLINT_C_OUTPUT) or os.path.getmtime(BASE_DIR + JSLINT_SOURCE) > os.path.getmtime(BASE_DIR + JSLINT_C_OUTPUT):
+          print "Converting %s to %s..." % (os.path.basename(JSLINT_SOURCE), os.path.basename(JSLINT_C_OUTPUT))
+          js2c.JS2C(["./lib/jslint/fulljslint.js"], ["./src/jslint.h"])
+      else:
+          print "Already converted %s to %s" % (os.path.basename(JSLINT_SOURCE), os.path.basename(JSLINT_C_OUTPUT))

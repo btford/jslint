@@ -68,7 +68,7 @@ namespace jslint {
         std::ifstream myfile (src_file);
         if (myfile.is_open()) {
             //std::cout << jslint::native_fulljslint << std::endl;
-            result = std::string(jslint::native_jslint) + "\nvar file_to_lint = [];\n";
+            result = std::string(jslint::native_fulljslint) + "\nvar file_to_lint = [];\n";
             while (! myfile.eof() ) {
                 std::getline (myfile, line);
                 jsline =  "file_to_lint.push(\"" + jslint::find_and_replace(line,"\"", "\\\"") + "\");";
