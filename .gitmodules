@@ -1,3 +1,6 @@
 [submodule "lib/v8"]
 	path = lib/v8
 	url = git://github.com/v8/v8.git
+[submodule "lib/jslint"]
+	path = lib/jslint
+	url = git://github.com/douglascrockford/JSLint.git
