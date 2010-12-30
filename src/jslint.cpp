@@ -25,14 +25,15 @@ THE SOFTWARE.
 #include <fstream>
 #include <string>
 #include <cstdio>
+#include "tclap/CmdLine.h"
 #include "jslint.h"
 
 using namespace v8;
 
 namespace jslint {
-std::string find_and_replace(std::string tInput, std::string tFind, std::string tReplace) { 
-    int uPos = 0; 
-    int uFindLen = tFind.length(); 
+std::string find_and_replace(std::string tInput, std::string tFind, std::string tReplace) {
+    int uPos = 0;
+    int uFindLen = tFind.length();
     int uReplaceLen = tReplace.length();
 
     if( uFindLen == 0 )
@@ -78,44 +79,62 @@ Handle<String> load_source_js (char* src_file) {
         } else {
             std::cout << "jslint: Couldn't open file " << src_file << std::endl;
             throw Exception();
-        } 
+        }
 }
 }
 int main(int argc, char* argv[]) {
-    
-    if (argv[1]) {
-        // Create a stack-allocated handle scope.
-        HandleScope handle_scope;
 
-        // Create a new context.
-        Persistent<Context> context = Context::New();
+    try {
 
-        // Enter the created context for compiling and
-        // running the jslint
-        Context::Scope context_scope(context);
+        // Get user options
+        TCLAP::CmdLine cmd("JSLint", ' ', "0.1");
+        TCLAP::ValueArg<std::string> optionsArg("o", "options", "JSLint options", false, "", "string", cmd);
+        TCLAP::UnlabeledMultiArg<std::string> filesArg("files", "file names", true, "string", cmd);
 
-        try{
-          // Create a string containing the JavaScript source code.
-          Handle<String> source = jslint::load_source_js(argv[1]);
+        cmd.parse( argc, argv );
 
-          // Compile the source code.
-          Handle<Script> script = Script::Compile(source);
+        std::string options = optionsArg.getValue();
+        std::vector<std::string> files = filesArg.getValue();
 
-          // Run the script to get the result.
-          Handle<Value> result = script->Run();
+        for (int i=0; i < files.size(); i++) {
 
-          // Convert the result to an ASCII string and print it.
-          String::AsciiValue ascii(result);
-          printf("%s\n", *ascii);          
-        } catch(v8::Exception e) {
-          // nothing
+            std::string fileName = files[i];
+
+            // Create a stack-allocated handle scope.
+            HandleScope handle_scope;
+
+            // Create a new context.
+            Persistent<Context> context = Context::New();
+
+            // Enter the created context for compiling and
+            // running the jslint
+            Context::Scope context_scope(context);
+
+            try {
+              // Create a string containing the JavaScript source code.
+
+              Handle<String> source = jslint::load_source_js(const_cast<char *>(fileName.c_str()));
+
+              // Compile the source code.
+              Handle<Script> script = Script::Compile(source);
+
+              // Run the script to get the result.
+              Handle<Value> result = script->Run();
+
+              // Convert the result to an ASCII string and print it.
+              String::AsciiValue ascii(result);
+              printf("%s\n", *ascii);
+            } catch(v8::Exception e) {
+              // nothing
+            }
+
+            // Dispose the persistent context.
+            context.Dispose();
+
         }
 
-        // Dispose the persistent context.
-        context.Dispose();
-
-    } else {
-      std::cout << "Usage: jslint file.js" << std::endl;
+    } catch (TCLAP::ArgException &e) {
+        std::cerr << "error: " << e.error() << " for arg " << e.argId() << std::endl;
     }
 
     return 0;
